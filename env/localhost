@@ -1,0 +1,4 @@
+CONTEXT_PATH=/
+GITHUB_CLIENT_ID=<<GitHub Client ID>>
+GITHUB_CLIENT_SECRET=<<GitHub Client Secret>>
+OAUTH_CALLBACK_URL=http://localhost:8000/hub/oauth_callback

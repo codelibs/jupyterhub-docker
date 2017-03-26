@@ -1,0 +1,82 @@
+#!/bin/bash
+
+cd `dirname $0`
+cd ..
+
+BASE_DIR=`pwd`
+SCRIPTNAME=jupyter-docker
+if [ x"$JD_IMAGE_NAME" = x ] ; then
+  JD_IMAGE_NAME=marevol/jupyterhub
+fi
+if [ x"$JD_HOSTNAME" = x ] ; then
+  JD_HOSTNAME=`uname -n`
+fi
+if [ ! -z `which nvidia-docker` ] ; then
+  DOCKER_CMD=`which nvidia-docker`
+elif [ ! -z `which docker` ] ; then
+  DOCKER_CMD=`which docker`
+else
+  echo "docker command is not found."
+  exit 1
+fi
+
+start_container() {
+  $DOCKER_CMD start `$DOCKER_CMD ps -a | grep $JD_IMAGE_NAME | awk '{print $1}' | head -n1`
+}
+
+stop_container() {
+  $DOCKER_CMD stop `$DOCKER_CMD ps | grep $JD_IMAGE_NAME | awk '{print $1}'`
+}
+
+status_container() {
+  $DOCKER_CMD ps -a | grep $JD_IMAGE_NAME
+}
+
+remove_image() {
+  $DOCKER_CMD rm `$DOCKER_CMD ps -a | grep $JD_IMAGE_NAME | awk '{print $1}'`
+  $DOCKER_CMD rmi `$DOCKER_CMD images | grep $JD_IMAGE_NAME | awk '{print $3}'`
+}
+
+build_image() {
+  $DOCKER_CMD build -t $JD_IMAGE_NAME $BASE_DIR
+}
+
+run_container() {
+  ENV_FILE=$BASE_DIR/env/$JD_HOSTNAME
+  if [ ! -f $ENV_FILE ] ; then
+    ENV_FILE=$BASE_DIR/env/localhost
+  fi
+
+  ARG_FILE=$BASE_DIR/arg/$JD_HOSTNAME
+  if [ ! -f $ARG_FILE ] ; then
+    ARG_FILE=$BASE_DIR/arg/localhost
+  fi
+
+  ARGS="--env-file=$ENV_FILE "`cat $ARG_FILE`
+  $DOCKER_CMD run -d -t $ARGS $JD_IMAGE_NAME
+}
+
+case "$1" in
+  start)
+    start_container
+    ;;
+  stop)
+    stop_container
+    ;;
+  status)
+    status_container
+    ;;
+  remove)
+    remove_image
+    ;;
+  build)
+    build_image
+    ;;
+  run)
+    run_container
+    ;;
+  *)
+    echo "Usage: $SCRIPTNAME {start|stop|status|remove|build|run}" >&2
+    exit 3
+    ;;
+esac
