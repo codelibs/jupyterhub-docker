@@ -6,7 +6,7 @@ cd ..
 BASE_DIR=`pwd`
 SCRIPTNAME=jupyter-docker
 if [ x"$JD_IMAGE_NAME" = x ] ; then
-  JD_IMAGE_NAME=marevol/jupyterhub
+  JD_IMAGE_NAME=codelibs/jupyterhub
 fi
 if [ x"$JD_HOSTNAME" = x ] ; then
   JD_HOSTNAME=`uname -n`
