@@ -13,8 +13,10 @@ if [ x"$JD_HOSTNAME" = x ] ; then
 fi
 if [ ! -z `which nvidia-docker` ] ; then
   DOCKER_CMD=`which nvidia-docker`
+  DOCKER_FROM="nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04"
 elif [ ! -z `which docker` ] ; then
   DOCKER_CMD=`which docker`
+  DOCKER_FROM="ubuntu/xenial"
 else
   echo "docker command is not found."
   exit 1
@@ -38,10 +40,11 @@ remove_image() {
 }
 
 build_image() {
-  $DOCKER_CMD build -t $JD_IMAGE_NAME $BASE_DIR
+  sed -e "s|^FROM.*|FROM $DOCKER_FROM|" $BASE_DIR/Dockerfile | $DOCKER_CMD build -t $JD_IMAGE_NAME $BASE_DIR
 }
 
 run_container() {
+  CMD=$1
   ENV_FILE=$BASE_DIR/env/$JD_HOSTNAME
   if [ ! -f $ENV_FILE ] ; then
     ENV_FILE=$BASE_DIR/env/localhost
@@ -53,7 +56,11 @@ run_container() {
   fi
 
   ARGS="--env-file=$ENV_FILE "`cat $ARG_FILE`
-  $DOCKER_CMD run -d -t $ARGS $JD_IMAGE_NAME
+  if [ x"$CMD" == "x" ] ; then
+    $DOCKER_CMD run -d -t $ARGS $JD_IMAGE_NAME
+  else
+    $DOCKER_CMD run -it $ARGS $JD_IMAGE_NAME $CMD
+  fi
 }
 
 case "$1" in
@@ -74,6 +81,9 @@ case "$1" in
     ;;
   run)
     run_container
+    ;;
+  shell)
+    run_container /bin/bash
     ;;
   *)
     echo "Usage: $SCRIPTNAME {start|stop|status|remove|build|run}" >&2

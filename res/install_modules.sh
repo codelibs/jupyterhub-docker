@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# TODO modify the following installation
 python3 -m pip install Cython
 python3 -m pip install autopep8
 python3 -m pip install chainer
@@ -15,3 +16,6 @@ python3 -m pip install requests
 python3 -m pip install scipy
 python3 -m pip install scikit-learn
 python3 -m pip install yapf
+python3 -m pip install pydotplus
+python3 -m pip install bs4
+python3 -m pip install predictionio

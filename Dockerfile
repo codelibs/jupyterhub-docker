@@ -1,5 +1,4 @@
 FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
-#FROM ubuntu/xenial
 
 MAINTAINER CodeLibs Project
 
@@ -27,6 +26,7 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-3.5.5-Linux-x86_64.sh
 RUN python3 -m pip install jupyter
 RUN python3 -m pip install jupyterhub
 RUN python3 -m pip install oauthenticator
+RUN python3 -m pip install jupyterhub-ldapauthenticator
 RUN python3 -m pip install jupyter_contrib_nbextensions
 RUN python3 -m pip install ipyparallel
 
@@ -44,6 +44,8 @@ RUN mkdir -p /opt/jupyterhub/
 WORKDIR /opt/jupyterhub/
 ADD res/jupyterhub_config.py jupyterhub_config.py
 ADD res/install_modules.sh install_modules.sh
+#ADD res/server.key server.key
+#ADD res/server.crt server.crt
 RUN ["sh", "/opt/jupyterhub/install_modules.sh"]
 
 EXPOSE 8000
