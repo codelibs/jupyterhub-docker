@@ -4,13 +4,15 @@ MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN apt-get update && \
+    apt-get upgrade -y
+RUN apt-get install -y locales
+
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-RUN apt-get update && \
-    apt-get upgrade -y
 RUN apt-get install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev wget bzip2 sudo vim
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
