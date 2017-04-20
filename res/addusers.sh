@@ -1,5 +1,6 @@
 #!/bin/sh
 
+cd `dirname $0`
 IFS="
 "
 for line in `cat userlist`; do

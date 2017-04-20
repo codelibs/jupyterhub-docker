@@ -18,8 +18,8 @@ RUN apt-get install -y build-essential curl git gcc make openssl libssl-dev libb
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
 
-RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-3.5.5-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
-    echo 'fa75786e104855cd2710edbea5458c2d */tmp/miniconda.sh' | md5sum -c - && \
+RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.3.11-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
+    echo '1924c8d9ec0abf09005aa03425e9ab1a */tmp/miniconda.sh' | md5sum -c - && \
     bash /tmp/miniconda.sh -f -b -p /opt/conda && \
     /opt/conda/bin/conda install --yes -c conda-forge python=3.5 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy && \
     /opt/conda/bin/pip install --upgrade pip && \
@@ -40,7 +40,6 @@ ENV OAUTHENTICATOR_DIR /opt/oauthenticator
 ADD res/addusers.sh /opt/oauthenticator/addusers.sh
 ADD res/userlist /opt/oauthenticator/userlist
 RUN chmod 700 /opt/oauthenticator
-RUN ["sh", "/opt/oauthenticator/addusers.sh"]
 
 RUN mkdir -p /opt/jupyterhub/
 WORKDIR /opt/jupyterhub/
@@ -54,5 +53,6 @@ EXPOSE 8000
 
 LABEL org.jupyter.service="jupyterhub"
 
+CMD ["sh", "/opt/oauthenticator/addusers.sh"]
 CMD ["jupyterhub"]
 
