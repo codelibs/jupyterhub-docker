@@ -21,10 +21,11 @@ ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
 RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.3.11-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
     echo '1924c8d9ec0abf09005aa03425e9ab1a */tmp/miniconda.sh' | md5sum -c - && \
     bash /tmp/miniconda.sh -f -b -p /opt/conda && \
-    /opt/conda/bin/conda install --yes -c conda-forge python=3.5 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy && \
+    /opt/conda/bin/conda install --yes -c conda-forge python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy && \
     /opt/conda/bin/pip install --upgrade pip && \
     rm /tmp/miniconda.sh
 
+RUN python3 -m pip install notebook==4.4.1
 RUN python3 -m pip install jupyter
 RUN python3 -m pip install jupyterhub
 RUN python3 -m pip install oauthenticator
