@@ -4,8 +4,11 @@ MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && \
-    apt-get upgrade -y
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
+RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
+RUN apt-get update
+#RUN apt-get upgrade -y
 RUN apt-get install -y locales
 
 RUN locale-gen en_US.UTF-8
@@ -16,6 +19,9 @@ ENV LC_ALL en_US.UTF-8
 RUN apt-get install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev cmake
 RUN apt-get install -y wget bzip2 sudo vim unzip enchant libhunspell-dev font-manager
 RUN apt-get install -y ocl-icd-libopencl1 and ocl-icd-opencl-dev libboost-dev libboost-system-dev libboost-filesystem-dev
+RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/oracle-jdk8-installer
 
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
@@ -52,6 +58,8 @@ ADD res/install_modules.sh install_modules.sh
 #ADD res/server.key server.key
 #ADD res/server.crt server.crt
 RUN ["sh", "/opt/jupyterhub/install_modules.sh"]
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 EXPOSE 8000
 
