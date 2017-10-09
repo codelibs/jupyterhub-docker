@@ -10,7 +10,8 @@ c.JupyterHub.log_level = 10
 #c.JupyterHub.ssl_cert = '/opt/jupyterhub/server.crt'
 
 # GitHub
-c.JupyterHub.authenticator_class = 'oauthenticator.LocalGitHubOAuthenticator'
+from oauthenticator.github import LocalGitHubOAuthenticator
+c.JupyterHub.authenticator_class = LocalGitHubOAuthenticator
 c.LocalGitHubOAuthenticator.create_system_users = True
 c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 

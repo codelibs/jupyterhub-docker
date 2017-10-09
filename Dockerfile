@@ -33,7 +33,7 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.3.21-Linux-x86_64.s
     /opt/conda/bin/pip install --upgrade pip && \
     rm /tmp/miniconda.sh
 
-RUN python3 -m pip install notebook==4.4.1
+RUN python3 -m pip install notebook==5.1.0
 RUN python3 -m pip install jupyter
 RUN python3 -m pip install jupyterhub
 RUN python3 -m pip install oauthenticator
