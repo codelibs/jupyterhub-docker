@@ -40,7 +40,7 @@ remove_image() {
 }
 
 build_image() {
-  sed -e "s|^FROM.*|FROM $DOCKER_FROM|" $BASE_DIR/Dockerfile | $DOCKER_CMD build -t $JD_IMAGE_NAME $BASE_DIR
+  sed -e "s|^FROM.*|FROM $DOCKER_FROM|" $BASE_DIR/Dockerfile | $DOCKER_CMD build $DOCKER_OPTS -t $JD_IMAGE_NAME $BASE_DIR
 }
 
 run_container() {
