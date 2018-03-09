@@ -1,4 +1,4 @@
-FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
+FROM nvidia/cuda:9.0-cudnn7-devel-ubuntu16.04
 
 MAINTAINER CodeLibs Project
 
@@ -26,14 +26,14 @@ RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
 
-RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.3.30-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
-    echo '0b80a152332a4ce5250f3c09589c7a81 */tmp/miniconda.sh' | md5sum -c - && \
+RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.4.10-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
+    echo 'bec6203dbb2f53011e974e9bf4d46e93 */tmp/miniconda.sh' | md5sum -c - && \
     bash /tmp/miniconda.sh -f -b -p /opt/conda && \
     /opt/conda/bin/conda install --yes -c conda-forge python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy && \
     /opt/conda/bin/pip install --upgrade pip && \
     rm /tmp/miniconda.sh
 
-RUN python3 -m pip install notebook==5.2.1
+RUN python3 -m pip install notebook
 RUN python3 -m pip install jupyter
 RUN python3 -m pip install jupyterhub
 RUN python3 -m pip install oauthenticator
