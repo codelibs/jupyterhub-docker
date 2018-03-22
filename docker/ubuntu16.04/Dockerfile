@@ -1,30 +1,23 @@
-FROM nvidia/cuda:9.0-cudnn7-devel-ubuntu16.04
+FROM ubuntu:xenial
 
 MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
-RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-RUN apt-get update
-RUN apt-get upgrade -y
-RUN apt-get install -y locales
+RUN apt update
+RUN apt upgrade -y
+RUN apt install -y locales
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-RUN apt-get install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev cmake \
-    wget bzip2 sudo vim unzip enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
-    libboost-dev libboost-system-dev libboost-filesystem-dev
-RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /var/cache/oracle-jdk8-installer
+RUN apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev cmake \
+    libxml2-dev wget bzip2 sudo vim unzip && \
+    apt clean
 
-ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
-ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
+ENV PATH=/opt/conda/bin:$PATH
 
 RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.4.10-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
     echo 'bec6203dbb2f53011e974e9bf4d46e93 */tmp/miniconda.sh' | md5sum -c - && \
@@ -39,7 +32,6 @@ RUN python3 -m pip install jupyterhub
 RUN python3 -m pip install oauthenticator
 RUN python3 -m pip install jupyterhub-ldapauthenticator
 RUN python3 -m pip install jupyter_contrib_nbextensions
-RUN python3 -m pip install ipyparallel
 
 RUN jupyter contrib nbextension install --system
 
@@ -54,12 +46,9 @@ RUN chmod 700 /opt/oauthenticator
 RUN mkdir -p /opt/jupyterhub/
 WORKDIR /opt/jupyterhub/
 ADD res/jupyterhub_config.py jupyterhub_config.py
-ADD res/install_modules.sh install_modules.sh
+# LDAP
 #ADD res/server.key server.key
 #ADD res/server.crt server.crt
-RUN ["sh", "/opt/jupyterhub/install_modules.sh"]
-
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 EXPOSE 8000
 

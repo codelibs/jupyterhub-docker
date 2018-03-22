@@ -2,24 +2,12 @@
 
 cd `dirname $0`
 cd ..
-
 BASE_DIR=`pwd`
+
 SCRIPTNAME=jupyter-docker
-if [ x"$JD_IMAGE_NAME" = x ] ; then
-  JD_IMAGE_NAME=codelibs/jupyterhub
-fi
+
 if [ x"$JD_HOSTNAME" = x ] ; then
   JD_HOSTNAME=`uname -n`
-fi
-if [ ! -z `which nvidia-docker` ] ; then
-  DOCKER_CMD=`which nvidia-docker`
-  DOCKER_FROM="nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04"
-elif [ ! -z `which docker` ] ; then
-  DOCKER_CMD=`which docker`
-  DOCKER_FROM="ubuntu/xenial"
-else
-  echo "docker command is not found."
-  exit 1
 fi
 
 start_container() {
@@ -40,11 +28,14 @@ remove_image() {
 }
 
 build_image() {
-  sed -e "s|^FROM.*|FROM $DOCKER_FROM|" $BASE_DIR/Dockerfile | $DOCKER_CMD build $DOCKER_OPTS -t $JD_IMAGE_NAME $BASE_DIR
+  if [ ! -d $BASE_DIR/docker/$JD_IMAGE_TAG ] ; then
+    echo "$BASE_DIR/docker/$JD_IMAGE_TAG does not exist."
+    exit 1
+  fi
+  $DOCKER_CMD build $DOCKER_OPTS -t $JD_IMAGE_NAME -f $BASE_DIR/docker/$JD_IMAGE_TAG/Dockerfile $BASE_DIR
 }
 
 run_container() {
-  CMD=$1
   ENV_FILE=$BASE_DIR/env/$JD_HOSTNAME
   if [ ! -f $ENV_FILE ] ; then
     ENV_FILE=$BASE_DIR/env/localhost
@@ -56,14 +47,49 @@ run_container() {
   fi
 
   ARGS="--env-file=$ENV_FILE "`cat $ARG_FILE`
-  if [ x"$CMD" == "x" ] ; then
+  if [ x"$RUN_CMD" == "x" ] ; then
     $DOCKER_CMD run -d -t $ARGS $JD_IMAGE_NAME
   else
-    $DOCKER_CMD run -it $ARGS $JD_IMAGE_NAME $CMD
+    $DOCKER_CMD run -it $ARGS $JD_IMAGE_NAME $RUN_CMD
   fi
 }
 
-case "$1" in
+while [[ $# -gt 0 ]] ; do
+  case $1 in
+    -t|--tag)
+      JD_IMAGE_TAG=$2
+      shift
+      shift
+      ;;
+    -c|--command)
+      RUN_CMD=$2
+      shift
+      shift
+      ;;
+    start|stop|status|remove|build|run)
+      SUB_COMMAND=$1
+      shift
+      ;;
+  esac
+done
+
+if [ x"$JD_IMAGE_TAG" = "x" ] ; then
+  echo "No docker image tag(-t)."
+  exit 1
+fi
+JD_IMAGE_NAME=codelibs/jupyterhub:$JD_IMAGE_TAG
+
+if [[ "$JD_IMAGE_TAG" =~ ^cuda ]] ; then
+  DOCKER_CMD=`which nvidia-docker`
+else
+  DOCKER_CMD=`which docker`
+fi
+if [ x"$DOCKER_CMD" = "x" ] ; then
+  echo "docker command is not found."
+  exit 1
+fi
+
+case "$SUB_COMMAND" in
   start)
     start_container
     ;;
@@ -81,9 +107,6 @@ case "$1" in
     ;;
   run)
     run_container
-    ;;
-  shell)
-    run_container /bin/bash
     ;;
   *)
     echo "Usage: $SCRIPTNAME {start|stop|status|remove|build|run}" >&2
