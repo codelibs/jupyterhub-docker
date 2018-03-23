@@ -12,6 +12,7 @@ RUN apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd
 RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
     rm -rf /var/cache/oracle-jdk8-installer
 
+RUN python3 -m pip install autopep8
 RUN python3 -m pip install Cython
 RUN python3 -m pip install better_exceptions
 RUN python3 -m pip install bs4
