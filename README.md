@@ -52,7 +52,7 @@ For details, see `res/addusers.sh`.
 
 ## Operations
 
-### Run Docker Image
+### Run Docker Container
 
 ```
 ./bin/jupyter-docker run -t <tag name>
@@ -61,8 +61,13 @@ For details, see `res/addusers.sh`.
 Tag names are as below:
 
 - ubuntu16.04
-- cuda9.1-cudnn7
+- cuda9.0-cudnn7
 - cuda-machinelearning
 
 URL for this Jupyterhub is `http://localhost:8000/`.
 
+### Stop Docker Container
+
+```
+./bin/jupyter-docker stop -t <tag name>
+```

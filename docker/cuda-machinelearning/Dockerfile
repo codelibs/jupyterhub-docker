@@ -7,10 +7,11 @@ RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /e
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
 RUN apt-get update
 
-RUN apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
-    libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 cuda-command-line-tools-9-0
 RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
     rm -rf /var/cache/oracle-jdk8-installer
+RUN apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
+    libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install Cython
 RUN python3 -m pip install better_exceptions
@@ -49,4 +50,5 @@ RUN python3 -m pip install mlxtend
 RUN python3 -m pip install edward
 RUN python3 -m pip install scikit-image
 RUN python3 -m pip install opencv-python
+RUN python3 -m pip install kaggle
 
