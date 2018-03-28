@@ -13,6 +13,7 @@ RUN apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd
     libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 && \
     rm -rf /var/lib/apt/lists/*
 
+RUN python3 -m pip install autopep8
 RUN python3 -m pip install Cython
 RUN python3 -m pip install better_exceptions
 RUN python3 -m pip install bs4
