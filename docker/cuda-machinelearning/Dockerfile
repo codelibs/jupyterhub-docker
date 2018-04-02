@@ -33,7 +33,7 @@ RUN python3 -m pip install pydotplus
 RUN python3 -m pip install nltk
 RUN python3 -m pip install cupy
 RUN python3 -m pip install chainer
-RUN python3 -m pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.6.0-cp36-cp36m-linux_x86_64.whl
+RUN python3 -m pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.7.0-cp36-cp36m-linux_x86_64.whl
 RUN python3 -m pip install keras
 RUN python3 -m pip install gensim
 RUN python3 -m pip install common-ml
@@ -52,4 +52,7 @@ RUN python3 -m pip install edward
 RUN python3 -m pip install scikit-image
 RUN python3 -m pip install opencv-python
 RUN python3 -m pip install kaggle
+RUN python3 -m pip install textblob
+RUN python3 -m textblob.download_corpora
+RUN python3 -m pip install geopy
 
