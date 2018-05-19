@@ -55,4 +55,5 @@ RUN python3 -m pip install kaggle
 RUN python3 -m pip install textblob
 RUN python3 -m textblob.download_corpora
 RUN python3 -m pip install geopy
+RUN python3 -m pip install plotly
 
