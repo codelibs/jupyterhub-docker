@@ -57,4 +57,8 @@ RUN python3 -m textblob.download_corpora
 RUN python3 -m pip install geopy
 RUN python3 -m pip install plotly
 RUN python3 -m pip install matplotlib_venn
+RUN python3 -m pip install pyicu
+RUN python3 -m pip install pycld2
+RUN python3 -m pip install morfessor
+RUN python3 -m pip install polyglot
 
