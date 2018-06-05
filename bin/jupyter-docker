@@ -66,6 +66,14 @@ while [[ $# -gt 0 ]] ; do
       shift
       shift
       ;;
+    -f|--force)
+      case $SUB_COMMAND in
+        build)
+          DOCKER_OPTS="$DOCKER_OPTS --no-cache=true"
+        ;;
+      esac
+      shift
+      ;;
     start|stop|status|remove|build|run)
       SUB_COMMAND=$1
       shift
