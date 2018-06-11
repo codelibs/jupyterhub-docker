@@ -1,4 +1,4 @@
-FROM codelibs/jupyterhub:cuda9.0-cudnn7
+FROM codelibs/jupyterhub:ubuntu16.04
 
 MAINTAINER CodeLibs Project
 
@@ -30,9 +30,8 @@ RUN python3 -m pip install scipy
 RUN python3 -m pip install scikit-learn
 RUN python3 -m pip install pydotplus
 RUN python3 -m pip install nltk
-RUN python3 -m pip install cupy
 RUN python3 -m pip install chainer
-RUN python3 -m pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp36-cp36m-linux_x86_64.whl
+RUN python3 -m pip install tensorflow
 RUN python3 -m pip install keras
 RUN python3 -m pip install gensim
 RUN python3 -m pip install common-ml

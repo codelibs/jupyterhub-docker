@@ -45,6 +45,7 @@ RUN python3 -m pip install oauthenticator
 RUN python3 -m pip install jupyterhub-ldapauthenticator
 RUN python3 -m pip install jupyter_contrib_nbextensions
 RUN python3 -m pip install autopep8
+RUN python3 -m pip install yapf
 
 RUN jupyter contrib nbextension install --system
 
