@@ -59,4 +59,5 @@ RUN python3 -m pip install pyicu
 RUN python3 -m pip install pycld2
 RUN python3 -m pip install morfessor
 RUN python3 -m pip install polyglot
+RUN python3 -m pip install wordbatch
 
