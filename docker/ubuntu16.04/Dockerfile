@@ -12,6 +12,7 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+ENV PIP_DEFAULT_TIMEOUT 180
 
 RUN apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev cmake \
     libxml2-dev wget bzip2 sudo vim unzip && \
@@ -19,8 +20,8 @@ RUN apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-d
 
 ENV PATH=/opt/conda/bin:$PATH
 
-RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.4.10-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
-    echo 'bec6203dbb2f53011e974e9bf4d46e93 */tmp/miniconda.sh' | md5sum -c - && \
+RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
+    echo 'a946ea1d0c4a642ddf0c3a26a18bb16d */tmp/miniconda.sh' | md5sum -c - && \
     bash /tmp/miniconda.sh -f -b -p /opt/conda && \
     /opt/conda/bin/conda install --yes -c conda-forge python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy && \
     /opt/conda/bin/pip install --upgrade pip && \
