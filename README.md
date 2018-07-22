@@ -13,13 +13,19 @@ A default authentication for JupyterHub Docker uses GitHub's OAuth.
 ./bin/jupyter-docker build -t ubuntu16.04
 ```
 
+### Machine Learning Image
+
+```
+./bin/jupyter-docker build -t machinelearning
+```
+
 ### CUDA based Image
 
 ```
 ./bin/jupyter-docker build -t cuda9.0-cudnn7
 ```
 
-## CUDA based Machine Learning Image
+### CUDA based Machine Learning Image
 
 ```
 ./bin/jupyter-docker build -t cuda-machinelearning
