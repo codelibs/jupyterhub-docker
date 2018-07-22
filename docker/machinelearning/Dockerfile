@@ -99,6 +99,7 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     GDAL_CONFIG=/usr/bin/gdal-config pip install fiona && pip install geopandas && \
     cd /usr/local/src && git clone git://github.com/scikit-learn-contrib/py-earth.git && \
     cd py-earth && python setup.py install && \
+    pip install essentia && \
     conda install -y pytorch torchvision -c pytorch && \
     pip install cffi && \
     cd /usr/local/src && git clone https://github.com/pytorch/audio && cd audio && python setup.py install && \
@@ -300,7 +301,8 @@ RUN pip install testpath && \
     pip install pyarabic && \
     pip install conx && \
     pip install pandasql && \
-    pip install trackml
+    pip install trackml && \
+    cd /usr/local/src && git clone https://github.com/JohnLangford/vowpal_wabbit.git && ./vowpal_wabbit/python/conda_install.sh
 
 RUN pip install --upgrade numpy && \
     pip install --upgrade pandas && \

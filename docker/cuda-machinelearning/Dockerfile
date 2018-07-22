@@ -30,7 +30,7 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     spacy download xx && \
     spacy download en_core_web_lg && \
     pip install opencv-python && \
-    pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp36-cp36m-linux_x86_64.whl && \
+    pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.9.0-cp36-cp36m-linux_x86_64.whl && \
     pip install textblob  && \
     python3 -m textblob.download_corpora && \
     pip install wordcloud && \
@@ -99,6 +99,7 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     GDAL_CONFIG=/usr/bin/gdal-config pip install fiona && pip install geopandas && \
     cd /usr/local/src && git clone git://github.com/scikit-learn-contrib/py-earth.git && \
     cd py-earth && python setup.py install && \
+    pip install essentia && \
     conda install -y pytorch torchvision -c pytorch && \
     pip install cffi && \
     cd /usr/local/src && git clone https://github.com/pytorch/audio && cd audio && python setup.py install && \
@@ -300,7 +301,8 @@ RUN pip install testpath && \
     pip install pyarabic && \
     pip install conx && \
     pip install pandasql && \
-    pip install trackml
+    pip install trackml && \
+    cd /usr/local/src && git clone https://github.com/JohnLangford/vowpal_wabbit.git && ./vowpal_wabbit/python/conda_install.sh
 
 RUN pip install --upgrade numpy && \
     pip install --upgrade pandas && \
