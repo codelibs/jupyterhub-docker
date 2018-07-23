@@ -301,8 +301,7 @@ RUN pip install testpath && \
     pip install pyarabic && \
     pip install conx && \
     pip install pandasql && \
-    pip install trackml && \
-    cd /usr/local/src && git clone https://github.com/JohnLangford/vowpal_wabbit.git && ./vowpal_wabbit/python/conda_install.sh
+    pip install trackml
 
 RUN pip install --upgrade numpy && \
     pip install --upgrade pandas && \
