@@ -5,11 +5,10 @@ MAINTAINER CodeLibs Project
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
 RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-RUN apt-get update
-
-RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
-    rm -rf /var/cache/oracle-jdk8-installer
 RUN apt-get update && \
+    apt-get install -y --no-install-recommends oracle-java8-installer && \
+    rm -rf /var/cache/oracle-jdk8-installer && \
+    apt-get update && \
     apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
     libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 \
     dbus fontconfig fontconfig-config fonts-dejavu-core fonts-droid-fallback ghostscript gsfonts hicolor-icon-theme \
@@ -22,6 +21,7 @@ RUN apt-get update && \
     libxcb-render0 libxcb-shm0 netpbm poppler-data p7zip-full imagemagick libatlas-base-dev zlib1g-dev liblcms2-dev libwebp-dev \
     libsasl2-dev libpq-dev graphviz libgdal-dev pandoc sox libsox-dev libsox-fmt-all libjpeg8-dev libjpeg-turbo8-dev \
     libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyyaml joblib \
@@ -55,7 +55,7 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     book_grammars brown brown_tei cess_cat cess_esp chat80 city_database cmudict \
     comtrans conll2000 conll2002 conll2007 crubadan dependency_treebank \
     europarl_raw floresta gazetteers genesis gutenberg \
-    ieer inaugural indian jeita kimmo knbc large_grammars lin_thesaurus mac_morpho machado \
+    ieer inaugural indian jeita kimmo large_grammars lin_thesaurus mac_morpho machado \
     masc_tagged maxent_ne_chunker maxent_treebank_pos_tagger moses_sample movie_reviews \
     mte_teip5 names nps_chat omw opinion_lexicon paradigms \
     pil pl196x porter_test ppattach problem_reports product_reviews_1 product_reviews_2 propbank \
@@ -74,7 +74,10 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     pip install packaging && \
     pip install Shapely && \
     pip install Cartopy && \
-    pip install mxnet
+    pip install mxnet && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
 RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     wget http://h2o-release.s3.amazonaws.com/h2o/latest_stable -O latest && \
     wget --no-check-certificate -i latest -O h2o.zip && rm latest && \
@@ -125,7 +128,10 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install scikit-optimize && \
     pip install haversine && \
     pip install toolz cytoolz && \
-    pip install sacred
+    pip install sacred && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
 RUN pip install plotly && \
     pip install git+https://github.com/nicta/dora.git && \
     pip install git+https://github.com/hyperopt/hyperopt.git && \
@@ -175,7 +181,10 @@ RUN pip install plotly && \
     pip install stemming && \
     conda install -y -c conda-forge fbprophet && \
     pip install holoviews geoviews && \
-    pip install hypertools
+    pip install hypertools && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
 RUN pip install nxviz && \
     pip install py_stringsimjoin && \
     pip install speedml && \
@@ -225,7 +234,10 @@ RUN pip install nxviz && \
     pip install category_encoders && \
     pip install google-cloud-bigquery && \
     pip install ortools && \
-    pip install scattertext
+    pip install scattertext && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
 RUN pip install pandas-datareader && \
     pip install pykoko && \
     pip install wordsegment && \
@@ -275,7 +287,10 @@ RUN pip install pandas-datareader && \
     pip install pyzmq && \
     pip install qtconsole && \
     pip install simplegeneric && \
-    pip install terminado
+    pip install terminado && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
 RUN pip install testpath && \
     pip install tornado && \
     pip install tqdm && \
@@ -301,7 +316,9 @@ RUN pip install testpath && \
     pip install pyarabic && \
     pip install conx && \
     pip install pandasql && \
-    pip install trackml
+    pip install trackml && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
 
 RUN pip install --upgrade numpy && \
     pip install --upgrade pandas && \
@@ -322,10 +339,9 @@ RUN pip install --upgrade numpy && \
     pip install pyicu && \
     pip install pycld2 && \
     pip install morfessor && \
-    pip install polyglot
-RUN pip uninstall -y tensorflow
-
-RUN rm -rf /root/.cache/pip/* && \
-    apt-get autoremove -y && apt-get clean && \
+    pip install polyglot && \
+    rm -rf /root/.cache/pip/* && \
     rm -rf /usr/local/src/*
+
+RUN pip uninstall -y tensorflow
 

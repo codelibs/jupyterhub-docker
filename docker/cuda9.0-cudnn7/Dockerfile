@@ -18,35 +18,42 @@ ENV CUDNN_VERSION 7.0.5.15
 LABEL com.nvidia.cudnn.version="${CUDNN_VERSION}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-            libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
-            libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0
+    libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
+    libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN apt-mark hold libcudnn7 libcudnn7-dev cuda-libraries-dev-$CUDA_PKG_VERSION cuda-nvml-dev-$CUDA_PKG_VERSION \
     cuda-minimal-build-$CUDA_PKG_VERSION cuda-command-line-tools-$CUDA_PKG_VERSION libnccl-dev \
     cuda-libraries-$CUDA_PKG_VERSION libnccl2 cuda-cudart-$CUDA_PKG_VERSION
 
-RUN apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev cmake \
-    libxml2-dev wget bzip2 sudo vim unzip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev cmake libxml2-dev wget bzip2 sudo vim unzip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
-RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh -O /tmp/miniconda.sh  && \
-    echo 'a946ea1d0c4a642ddf0c3a26a18bb16d */tmp/miniconda.sh' | md5sum -c - && \
-    bash /tmp/miniconda.sh -f -b -p /opt/conda && \
-    /opt/conda/bin/conda install --yes -c conda-forge python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy && \
-    /opt/conda/bin/pip install --upgrade pip && \
-    rm /tmp/miniconda.sh
+RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O /tmp/miniconda.sh \
+    && echo 'e1045ee415162f944b6aebfe560b8fee */tmp/miniconda.sh' | md5sum -c - \
+    && bash /tmp/miniconda.sh -f -b -p /opt/conda \
+    && /opt/conda/bin/conda install --yes -c conda-forge \
+    python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy ncurses \
+    && /opt/conda/bin/pip install --upgrade pip \
+    && /opt/conda/bin/conda clean --all \
+    && rm /tmp/miniconda.sh
 
-RUN python3 -m pip install notebook
-RUN python3 -m pip install jupyter
-RUN python3 -m pip install jupyterhub
-RUN python3 -m pip install oauthenticator
-RUN python3 -m pip install jupyterhub-ldapauthenticator
-RUN python3 -m pip install jupyter_contrib_nbextensions
-RUN python3 -m pip install autopep8
-RUN python3 -m pip install yapf
+RUN python3 -m pip install notebook \
+    && python3 -m pip install jupyter \
+    && python3 -m pip install jupyterhub \
+    && python3 -m pip install oauthenticator \
+    && python3 -m pip install jupyterhub-ldapauthenticator \
+    && python3 -m pip install jupyter_contrib_nbextensions \
+    && python3 -m pip install autopep8 \
+    && python3 -m pip install yapf \
+    && rm -rf /root/.cache/pip/* \
+    && rm -rf /usr/local/src/*
 
 RUN jupyter contrib nbextension install --system
 
