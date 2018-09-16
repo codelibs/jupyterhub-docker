@@ -20,7 +20,7 @@ RUN apt-get update && \
     libpaper-utils libpaper1 libpixman-1-0 libpng12-0 librsvg2-2 librsvg2-common libthai-data libthai0 libtiff5 libwmf0.2-7 \
     libxcb-render0 libxcb-shm0 netpbm poppler-data p7zip-full imagemagick libatlas-base-dev zlib1g-dev liblcms2-dev libwebp-dev \
     libsasl2-dev libpq-dev graphviz libgdal-dev pandoc sox libsox-dev libsox-fmt-all libjpeg8-dev libjpeg-turbo8-dev \
-    libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 && \
+    libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 libgeos-dev libgdal1-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -30,6 +30,8 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     spacy download xx && \
     spacy download en_core_web_lg && \
     pip install opencv-python && \
+    pip install keras_applications && \
+    pip install keras_preprocessing && \
     pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.9.0-cp36-cp36m-linux_x86_64.whl && \
     pip install textblob  && \
     python3 -m textblob.download_corpora && \
@@ -49,7 +51,10 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     pip install hep_ml && \
     pip install chainer && \
     pip install nltk && \
-    mkdir -p /usr/share/nltk_data && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
+RUN mkdir -p /usr/share/nltk_data && \
     python -m nltk.downloader -d /usr/share/nltk_data abc alpino averaged_perceptron_tagger \
     basque_grammars biocreative_ppi bllip_wsj_no_aux \
     book_grammars brown brown_tei cess_cat cess_esp chat80 city_database cmudict \
@@ -66,7 +71,18 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     vader_lexicon verbnet webtext word2vec_sample wordnet wordnet_ic words ycoe && \
     pip install stop-words && \
     pip install Pillow && \
-    conda install -y basemap && \
+    pip install pyproj && \
+    cd /usr/local/src && git clone https://github.com/matplotlib/basemap.git && \
+    cd basemap && \
+    git checkout v1.1.0 && \
+    # Install geos
+    cd geos-3.3.3 && \
+    export GEOS_DIR=/usr/local && \
+    ./configure --prefix=$GEOS_DIR && \
+    make && make install && \
+    # Install basemap
+    cd .. && python setup.py install && \
+    pip install basemap --no-binary basemap && \
     cd /usr/local/src && git clone https://github.com/vitruvianscience/opendeep.git && \
     cd opendeep && python setup.py develop && \
     pip install ibis-framework && \
@@ -155,8 +171,7 @@ RUN pip install plotly && \
     pip install ImageHash && \
     conda install -y ecos && \
     conda install -y CVXcanon && \
-    cd /usr/local/src && git clone https://github.com/iskandr/fancyimpute && \
-    cd fancyimpute && python setup.py install && \
+    pip install fancyimpute && \
     pip install pymc3 && \
     pip install tifffile && \
     pip install spectral && \
@@ -181,6 +196,9 @@ RUN pip install plotly && \
     pip install stemming && \
     conda install -y -c conda-forge fbprophet && \
     pip install holoviews geoviews && \
+    #Temp fix: After installing holoviews and geoviews, deps for fiona and geopandas get really messed up. This is a very unelegant fix.
+    pip uninstall -y fiona geopandas && \
+    GDAL_CONFIG=/usr/bin/gdal-config pip install fiona && pip install geopandas && \
     pip install hypertools && \
     rm -rf /root/.cache/pip/* && \
     rm -rf /usr/local/src/*
@@ -212,7 +230,7 @@ RUN pip install nxviz && \
     pip install dask-ml[xgboost] && \
     pip install kmeans-smote --no-dependencies && \
     pip install --no-dependencies ethnicolr && \
-    pip install --no-cache-dir git+git://github.com/ppwwyyxx/tensorpack && \
+    pip install tensorpack && \
     pip install pycountry && pip install iso3166 && \
     pip install pydash && \
     pip install kmodes --no-dependencies && \
@@ -313,10 +331,22 @@ RUN pip install testpath && \
     pip install kmapper && \
     pip install shap && \
     pip install ray && \
+    pip install gym && \
+    pip install tensorforce && \
     pip install pyarabic && \
     pip install conx && \
     pip install pandasql && \
     pip install trackml && \
+    pip install tensorflow_hub && \
+    pip install PDPbox && \
+    pip install ggplot && \
+    pip install cesium && \
+    rm -rf /root/.cache/pip/* && \
+    rm -rf /usr/local/src/*
+
+# Pin Vowpal Wabbit v8.6.0 because 8.6.1 does not build or install successfully
+RUN cd /usr/local/src && git clone -b 8.6.0 https://github.com/JohnLangford/vowpal_wabbit.git && \
+    ./vowpal_wabbit/python/conda_install.sh && \
     rm -rf /root/.cache/pip/* && \
     rm -rf /usr/local/src/*
 
