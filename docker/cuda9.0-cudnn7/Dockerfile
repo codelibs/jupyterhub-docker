@@ -32,6 +32,11 @@ RUN apt-get update && apt install -y build-essential curl git gcc make openssl l
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
+    echo "12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855 *tini" | sha256sum -c - && \
+    mv tini /usr/local/bin/tini && \
+    chmod +x /usr/local/bin/tini
+
 ENV PATH=/opt/conda/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
@@ -76,5 +81,6 @@ EXPOSE 8000
 
 LABEL org.jupyter.service="jupyterhub"
 
+ENTRYPOINT ["tini", "--"]
 CMD ["jupyterhub"]
 

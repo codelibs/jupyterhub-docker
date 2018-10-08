@@ -66,7 +66,7 @@ RUN mkdir -p /usr/share/nltk_data && \
     pil pl196x porter_test ppattach problem_reports product_reviews_1 product_reviews_2 propbank \
     pros_cons ptb punkt qc reuters rslp rte sample_grammars semcor senseval sentence_polarity \
     sentiwordnet shakespeare sinica_treebank smultron snowball_data spanish_grammars \
-    state_union stopwords subjectivity swadesh switchboard tagsets timit toolbox treebank \
+    state_union stopwords subjectivity swadesh switchboard tagsets toolbox treebank \
     twitter_samples udhr2 udhr unicode_samples universal_tagset universal_treebanks_v20 \
     vader_lexicon verbnet webtext word2vec_sample wordnet wordnet_ic words ycoe && \
     pip install stop-words && \
