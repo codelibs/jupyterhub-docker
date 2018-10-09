@@ -4,9 +4,7 @@ MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt update
-RUN apt upgrade -y
-RUN apt install -y locales
+RUN apt update && apt upgrade -y && apt install -y locales && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
