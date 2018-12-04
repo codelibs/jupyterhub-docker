@@ -4,7 +4,7 @@ MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ADD clean-layer.sh  /tmp/clean-layer.sh
+ADD res/clean-layer.sh /tmp/clean-layer.sh
 
 RUN apt update && apt upgrade -y && apt install -y locales && rm -rf /var/lib/apt/lists/*
 

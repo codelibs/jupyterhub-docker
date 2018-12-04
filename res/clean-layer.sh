@@ -19,4 +19,6 @@ apt-get clean
 # Delete source files used for building binaries
 rm -rf /usr/local/src/*
 # Delete conda downloaded tarballs
-conda clean -y --tarballs
+if [ -f /opt/conda/bin/conda ] ; then
+  /opt/conda/bin/conda clean -y --tarballs
+fi
