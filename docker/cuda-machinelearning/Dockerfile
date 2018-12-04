@@ -21,8 +21,7 @@ RUN apt-get update && \
     libxcb-render0 libxcb-shm0 netpbm poppler-data p7zip-full imagemagick libatlas-base-dev zlib1g-dev liblcms2-dev libwebp-dev \
     libsasl2-dev libpq-dev graphviz libgdal-dev pandoc sox libsox-dev libsox-fmt-all libjpeg8-dev libjpeg-turbo8-dev \
     libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 libgeos-dev libgdal1-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    /tmp/clean-layer.sh
 
 RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyyaml joblib \
     husl geopy ml_metrics mne pyshp gensim spacy && \
@@ -51,8 +50,7 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     pip install hep_ml && \
     pip install chainer && \
     pip install nltk && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN mkdir -p /usr/share/nltk_data && \
     python -m nltk.downloader -d /usr/share/nltk_data abc alpino averaged_perceptron_tagger \
@@ -83,16 +81,21 @@ RUN mkdir -p /usr/share/nltk_data && \
     # Install basemap
     cd .. && python setup.py install && \
     pip install basemap --no-binary basemap && \
-    cd /usr/local/src && git clone https://github.com/vitruvianscience/opendeep.git && \
-    cd opendeep && python setup.py develop && \
     pip install ibis-framework && \
     conda install -y -c conda-forge proj4 && \
     pip install packaging && \
-    pip install Shapely && \
-    pip install Cartopy && \
+    pip install shapely && \
+    pip install cartopy && \
     pip install mxnet && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
+
+# vtk with dependencies
+RUN apt-get install -y libgl1-mesa-glx && \
+    pip install vtk && \
+    # xvfbwrapper with dependencies
+    apt-get install -y xvfb && \
+    pip install xvfbwrapper && \
+    /tmp/clean-layer.sh
 
 RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     wget http://h2o-release.s3.amazonaws.com/h2o/latest_stable -O latest && \
@@ -109,7 +112,7 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install orderedmultidict && \
     pip install smhasher && \
     pip install bokeh && \
-    conda install -y -c bokeh datashader && \
+    pip install datashader && \
     cd /usr/local/src && git clone https://github.com/danielhomola/boruta_py.git && \
     cd boruta_py && python setup.py install && \
     cd /usr/local/src && git clone git://github.com/nicolashennetier/pyeconometrics.git && \
@@ -126,7 +129,6 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install mplleaflet && \
     pip install gpxpy && \
     pip install arrow && \
-    pip install vtk && \
     pip install nilearn && \
     pip install nibabel && \
     pip install pronouncing && \
@@ -145,8 +147,7 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install haversine && \
     pip install toolz cytoolz && \
     pip install sacred && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN pip install plotly && \
     pip install git+https://github.com/nicta/dora.git && \
@@ -194,14 +195,13 @@ RUN pip install plotly && \
     pip install pyexcel-ods && \
     pip install sklearn-pandas && \
     pip install stemming && \
-    conda install -y -c conda-forge fbprophet && \
-    pip install holoviews geoviews && \
-    #Temp fix: After installing holoviews and geoviews, deps for fiona and geopandas get really messed up. This is a very unelegant fix.
+    pip install fbprophet && \
+    pip install holoviews && \
+    pip install geoviews && \
     pip uninstall -y fiona geopandas && \
     GDAL_CONFIG=/usr/bin/gdal-config pip install fiona && pip install geopandas && \
     pip install hypertools && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN pip install nxviz && \
     pip install py_stringsimjoin && \
@@ -209,7 +209,7 @@ RUN pip install nxviz && \
     pip install nibabel && \
     pip install mlens && \
     pip install scikit-multilearn && \
-    pip install -e git+http://github.com/tensorflow/cleverhans.git#egg=cleverhans && \
+    pip install cleverhans && \
     pip install leven && \
     pip install catboost && \
     # pip install mlbox && \
@@ -246,15 +246,14 @@ RUN pip install nxviz && \
     pip install --upgrade cysignals && \
     pip install pyfasttext && \
     pip install ktext && \
-    cd /usr/local/src && git clone --depth=1 https://github.com/facebookresearch/fastText.git && cd fastText && pip install . && \
+    pip install git+git://github.com/facebookresearch/fastText.git && \
     pip install hunspell && \
     pip install annoy && \
     pip install category_encoders && \
     pip install google-cloud-bigquery && \
     pip install ortools && \
     pip install scattertext && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN pip install pandas-datareader && \
     pip install pykoko && \
@@ -295,7 +294,6 @@ RUN pip install pandas-datareader && \
     pip install pandocfilters && \
     pip install pexpect && \
     pip install pickleshare && \
-    pip install prompt-toolkit && \
     pip install ptyprocess && \
     pip install Pygments && \
     pip install pyparsing && \
@@ -306,8 +304,7 @@ RUN pip install pandas-datareader && \
     pip install qtconsole && \
     pip install simplegeneric && \
     pip install terminado && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN pip install testpath && \
     pip install tornado && \
@@ -317,6 +314,7 @@ RUN pip install testpath && \
     pip install webencodings && \
     pip install widgetsnbextension && \
     pip install fastai && \
+    pip install torchtext && \
     pip install flashtext && \
     pip install marisa-trie && \
     pip install pyemd && \
@@ -341,14 +339,13 @@ RUN pip install testpath && \
     pip install PDPbox && \
     pip install ggplot && \
     pip install cesium && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    pip install rgf_python && \
+    /tmp/clean-layer.sh
 
 # Pin Vowpal Wabbit v8.6.0 because 8.6.1 does not build or install successfully
 RUN cd /usr/local/src && git clone -b 8.6.0 https://github.com/JohnLangford/vowpal_wabbit.git && \
     ./vowpal_wabbit/python/conda_install.sh && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN pip install --upgrade numpy && \
     pip install --upgrade pandas && \
@@ -359,6 +356,7 @@ RUN pip install --upgrade numpy && \
     pip install elasticsearch && \
     pip install esanpy && \
     pip install pyarrow && \
+    pip install feather-format && \
     pip install requests && \
     pip install pydotplus && \
     pip install predictionio && \
@@ -370,8 +368,7 @@ RUN pip install --upgrade numpy && \
     pip install pycld2 && \
     pip install morfessor && \
     pip install polyglot && \
-    rm -rf /root/.cache/pip/* && \
-    rm -rf /usr/local/src/*
+    /tmp/clean-layer.sh
 
 RUN pip uninstall -y tensorflow
 

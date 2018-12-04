@@ -4,6 +4,8 @@ MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
 
+ADD clean-layer.sh  /tmp/clean-layer.sh
+
 RUN apt update && apt upgrade -y && apt install -y locales && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
@@ -18,8 +20,7 @@ LABEL com.nvidia.cudnn.version="${CUDNN_VERSION}"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
     libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && /tmp/clean-layer.sh
 
 RUN apt-mark hold libcudnn7 libcudnn7-dev cuda-libraries-dev-$CUDA_PKG_VERSION cuda-nvml-dev-$CUDA_PKG_VERSION \
     cuda-minimal-build-$CUDA_PKG_VERSION cuda-command-line-tools-$CUDA_PKG_VERSION libnccl-dev \
@@ -27,8 +28,7 @@ RUN apt-mark hold libcudnn7 libcudnn7-dev cuda-libraries-dev-$CUDA_PKG_VERSION c
 
 RUN apt-get update && apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev \
     libreadline-dev libsqlite3-dev cmake libxml2-dev wget bzip2 sudo vim unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && /tmp/clean-layer.sh
 
 RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
     echo "12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855 *tini" | sha256sum -c - && \
@@ -44,8 +44,7 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.s
     && /opt/conda/bin/conda install --yes -c conda-forge \
     python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy ncurses \
     && /opt/conda/bin/pip install --upgrade pip \
-    && /opt/conda/bin/conda clean --all \
-    && rm /tmp/miniconda.sh
+    && /tmp/clean-layer.sh
 
 RUN python3 -m pip install notebook \
     && python3 -m pip install jupyter \
@@ -55,8 +54,7 @@ RUN python3 -m pip install notebook \
     && python3 -m pip install jupyter_contrib_nbextensions \
     && python3 -m pip install autopep8 \
     && python3 -m pip install yapf \
-    && rm -rf /root/.cache/pip/* \
-    && rm -rf /usr/local/src/*
+    && /tmp/clean-layer.sh
 
 RUN jupyter contrib nbextension install --system
 
