@@ -1,4 +1,4 @@
-FROM codelibs/jupyterhub:cuda9.0-cudnn7
+FROM codelibs/jupyterhub:cuda10.0-cudnn7
 
 MAINTAINER CodeLibs Project
 
@@ -370,5 +370,42 @@ RUN pip install --upgrade numpy && \
     pip install polyglot && \
     /tmp/clean-layer.sh
 
-RUN pip uninstall -y tensorflow
+ENV BAZEL_VERSION=0.15.2 \
+    PYTHON_BIN_PATH=/opt/conda/bin/python \
+    PYTHON_LIB_PATH=/opt/conda/lib/python3.6/site-packages \
+    TF_NEED_OPENCL_SYCL=0 \
+    TF_NEED_ROCM=0 \
+    TF_NEED_CUDA=1 \
+    TF_CUDA_VERSION=10.0 \
+    CUDA_TOOLKIT_PATH=/usr/local/cuda \
+    TF_CUDNN_VERSION=7 \
+    CUDNN_INSTALL_PATH=/usr/lib/x86_64-linux-gnu \
+    NCCL_INSTALL_PATH=/usr/lib/x86_64-linux-gnu \
+    TF_NCCL_VERSION=2 \
+    TF_CUDA_COMPUTE_CAPABILITIES=5.2,6.0,6.1,7.0 \
+    TF_CUDA_CLANG=0 \
+    GCC_HOST_COMPILER_PATH=/usr/bin/gcc \
+    TF_NEED_IGNITE=1 \
+    TF_ENABLE_XLA=1 \
+    TF_NEED_TENSORRT=0 \
+    TF_NEED_MPI=0 \
+    CC_OPT_FLAGS=-march=native \
+    TF_SET_ANDROID_WORKSPACE=0
+RUN pip uninstall -y tensorflow && \
+    pip uninstall -y tensorflow-gpu && \
+    cd /usr/local/src && \
+    wget https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
+    bash bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
+    rm bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
+    git clone https://github.com/tensorflow/tensorflow.git && \
+    cd tensorflow && \
+    git checkout r1.12 && \
+    ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} && \
+    ./configure && \
+    bazel build --verbose_failures --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package && \
+    ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg && \
+    pip install /tmp/tensorflow_pkg/tensorflow-*.whl && \
+    rm -rf /tmp/cc* /tmp/tensorflow_pkg && \
+    /tmp/clean-layer.sh
 

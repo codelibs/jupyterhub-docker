@@ -40,6 +40,6 @@ with open(join(root, 'userlist')) as f:
         if len(parts) > 2 and parts[2] == 'admin':
             admin.add(name)
 
-
+c.Spawner.default_url = '/lab'
 c.Spawner.env_keep.append('LD_LIBRARY_PATH')
 

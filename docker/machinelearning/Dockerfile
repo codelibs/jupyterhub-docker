@@ -5,11 +5,10 @@ MAINTAINER CodeLibs Project
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
 RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-RUN apt-get update
-
-RUN apt-get install -y --no-install-recommends oracle-java8-installer && \
-    rm -rf /var/cache/oracle-jdk8-installer
 RUN apt-get update && \
+    apt-get install -y --no-install-recommends oracle-java8-installer && \
+    rm -rf /var/cache/oracle-jdk8-installer && \
+    apt-get update && \
     apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
     libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 \
     dbus fontconfig fontconfig-config fonts-dejavu-core fonts-droid-fallback ghostscript gsfonts hicolor-icon-theme \
@@ -21,8 +20,8 @@ RUN apt-get update && \
     libpaper-utils libpaper1 libpixman-1-0 libpng12-0 librsvg2-2 librsvg2-common libthai-data libthai0 libtiff5 libwmf0.2-7 \
     libxcb-render0 libxcb-shm0 netpbm poppler-data p7zip-full imagemagick libatlas-base-dev zlib1g-dev liblcms2-dev libwebp-dev \
     libsasl2-dev libpq-dev graphviz libgdal-dev pandoc sox libsox-dev libsox-fmt-all libjpeg8-dev libjpeg-turbo8-dev \
-    libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 && \
-    rm -rf /var/lib/apt/lists/*
+    libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 libgeos-dev libgdal1-dev && \
+    /tmp/clean-layer.sh
 
 RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyyaml joblib \
     husl geopy ml_metrics mne pyshp gensim spacy && \
@@ -30,11 +29,13 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     spacy download xx && \
     spacy download en_core_web_lg && \
     pip install opencv-python && \
+    pip install keras_applications && \
+    pip install keras_preprocessing && \
     pip install tensorflow && \
     pip install textblob  && \
     python3 -m textblob.download_corpora && \
     pip install wordcloud && \
-    conda install -y -c conda-forge python-igraph && \
+    conda install -y -c conda-forge python-igraph pygpu && \
     pip install xgboost && \
     pip install lightgbm && \
     pip install Theano && \
@@ -49,32 +50,53 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     pip install hep_ml && \
     pip install chainer && \
     pip install nltk && \
-    mkdir -p /usr/share/nltk_data && \
+    /tmp/clean-layer.sh
+
+RUN mkdir -p /usr/share/nltk_data && \
     python -m nltk.downloader -d /usr/share/nltk_data abc alpino averaged_perceptron_tagger \
     basque_grammars biocreative_ppi bllip_wsj_no_aux \
     book_grammars brown brown_tei cess_cat cess_esp chat80 city_database cmudict \
     comtrans conll2000 conll2002 conll2007 crubadan dependency_treebank \
     europarl_raw floresta gazetteers genesis gutenberg \
-    ieer inaugural indian jeita kimmo knbc large_grammars lin_thesaurus mac_morpho machado \
+    ieer inaugural indian jeita kimmo large_grammars lin_thesaurus mac_morpho machado \
     masc_tagged maxent_ne_chunker maxent_treebank_pos_tagger moses_sample movie_reviews \
     mte_teip5 names nps_chat omw opinion_lexicon paradigms \
     pil pl196x porter_test ppattach problem_reports product_reviews_1 product_reviews_2 propbank \
     pros_cons ptb punkt qc reuters rslp rte sample_grammars semcor senseval sentence_polarity \
     sentiwordnet shakespeare sinica_treebank smultron snowball_data spanish_grammars \
-    state_union stopwords subjectivity swadesh switchboard tagsets timit toolbox treebank \
+    state_union stopwords subjectivity swadesh switchboard tagsets toolbox treebank \
     twitter_samples udhr2 udhr unicode_samples universal_tagset universal_treebanks_v20 \
     vader_lexicon verbnet webtext word2vec_sample wordnet wordnet_ic words ycoe && \
     pip install stop-words && \
     pip install Pillow && \
-    conda install -y basemap && \
-    cd /usr/local/src && git clone https://github.com/vitruvianscience/opendeep.git && \
-    cd opendeep && python setup.py develop && \
+    pip install pyproj && \
+    cd /usr/local/src && git clone https://github.com/matplotlib/basemap.git && \
+    cd basemap && \
+    git checkout v1.1.0 && \
+    # Install geos
+    cd geos-3.3.3 && \
+    export GEOS_DIR=/usr/local && \
+    ./configure --prefix=$GEOS_DIR && \
+    make && make install && \
+    # Install basemap
+    cd .. && python setup.py install && \
+    pip install basemap --no-binary basemap && \
     pip install ibis-framework && \
     conda install -y -c conda-forge proj4 && \
     pip install packaging && \
-    pip install Shapely && \
-    pip install Cartopy && \
-    pip install mxnet
+    pip install shapely && \
+    pip install cartopy && \
+    pip install mxnet && \
+    /tmp/clean-layer.sh
+
+# vtk with dependencies
+RUN apt-get install -y libgl1-mesa-glx && \
+    pip install vtk && \
+    # xvfbwrapper with dependencies
+    apt-get install -y xvfb && \
+    pip install xvfbwrapper && \
+    /tmp/clean-layer.sh
+
 RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     wget http://h2o-release.s3.amazonaws.com/h2o/latest_stable -O latest && \
     wget --no-check-certificate -i latest -O h2o.zip && rm latest && \
@@ -90,7 +112,7 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install orderedmultidict && \
     pip install smhasher && \
     pip install bokeh && \
-    conda install -y -c bokeh datashader && \
+    pip install datashader && \
     cd /usr/local/src && git clone https://github.com/danielhomola/boruta_py.git && \
     cd boruta_py && python setup.py install && \
     cd /usr/local/src && git clone git://github.com/nicolashennetier/pyeconometrics.git && \
@@ -107,7 +129,6 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install mplleaflet && \
     pip install gpxpy && \
     pip install arrow && \
-    pip install vtk && \
     pip install nilearn && \
     pip install nibabel && \
     pip install pronouncing && \
@@ -125,7 +146,9 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install scikit-optimize && \
     pip install haversine && \
     pip install toolz cytoolz && \
-    pip install sacred
+    pip install sacred && \
+    /tmp/clean-layer.sh
+
 RUN pip install plotly && \
     pip install git+https://github.com/nicta/dora.git && \
     pip install git+https://github.com/hyperopt/hyperopt.git && \
@@ -149,8 +172,7 @@ RUN pip install plotly && \
     pip install ImageHash && \
     conda install -y ecos && \
     conda install -y CVXcanon && \
-    cd /usr/local/src && git clone https://github.com/iskandr/fancyimpute && \
-    cd fancyimpute && python setup.py install && \
+    pip install fancyimpute && \
     pip install pymc3 && \
     pip install tifffile && \
     pip install spectral && \
@@ -173,16 +195,21 @@ RUN pip install plotly && \
     pip install pyexcel-ods && \
     pip install sklearn-pandas && \
     pip install stemming && \
-    conda install -y -c conda-forge fbprophet && \
-    pip install holoviews geoviews && \
-    pip install hypertools
+    pip install fbprophet && \
+    pip install holoviews && \
+    pip install geoviews && \
+    pip uninstall -y fiona geopandas && \
+    GDAL_CONFIG=/usr/bin/gdal-config pip install fiona && pip install geopandas && \
+    pip install hypertools && \
+    /tmp/clean-layer.sh
+
 RUN pip install nxviz && \
     pip install py_stringsimjoin && \
     pip install speedml && \
     pip install nibabel && \
     pip install mlens && \
     pip install scikit-multilearn && \
-    pip install -e git+http://github.com/tensorflow/cleverhans.git#egg=cleverhans && \
+    pip install cleverhans && \
     pip install leven && \
     pip install catboost && \
     # pip install mlbox && \
@@ -203,7 +230,7 @@ RUN pip install nxviz && \
     pip install dask-ml[xgboost] && \
     pip install kmeans-smote --no-dependencies && \
     pip install --no-dependencies ethnicolr && \
-    pip install --no-cache-dir git+git://github.com/ppwwyyxx/tensorpack && \
+    pip install tensorpack && \
     pip install pycountry && pip install iso3166 && \
     pip install pydash && \
     pip install kmodes --no-dependencies && \
@@ -219,13 +246,15 @@ RUN pip install nxviz && \
     pip install --upgrade cysignals && \
     pip install pyfasttext && \
     pip install ktext && \
-    cd /usr/local/src && git clone --depth=1 https://github.com/facebookresearch/fastText.git && cd fastText && pip install . && \
+    pip install git+git://github.com/facebookresearch/fastText.git && \
     pip install hunspell && \
     pip install annoy && \
     pip install category_encoders && \
     pip install google-cloud-bigquery && \
     pip install ortools && \
-    pip install scattertext
+    pip install scattertext && \
+    /tmp/clean-layer.sh
+
 RUN pip install pandas-datareader && \
     pip install pykoko && \
     pip install wordsegment && \
@@ -265,7 +294,6 @@ RUN pip install pandas-datareader && \
     pip install pandocfilters && \
     pip install pexpect && \
     pip install pickleshare && \
-    pip install prompt-toolkit && \
     pip install ptyprocess && \
     pip install Pygments && \
     pip install pyparsing && \
@@ -275,7 +303,9 @@ RUN pip install pandas-datareader && \
     pip install pyzmq && \
     pip install qtconsole && \
     pip install simplegeneric && \
-    pip install terminado
+    pip install terminado && \
+    /tmp/clean-layer.sh
+
 RUN pip install testpath && \
     pip install tornado && \
     pip install tqdm && \
@@ -284,6 +314,7 @@ RUN pip install testpath && \
     pip install webencodings && \
     pip install widgetsnbextension && \
     pip install fastai && \
+    pip install torchtext && \
     pip install flashtext && \
     pip install marisa-trie && \
     pip install pyemd && \
@@ -298,10 +329,23 @@ RUN pip install testpath && \
     pip install kmapper && \
     pip install shap && \
     pip install ray && \
+    pip install gym && \
+    pip install tensorforce && \
     pip install pyarabic && \
     pip install conx && \
     pip install pandasql && \
-    pip install trackml
+    pip install trackml && \
+    pip install tensorflow_hub && \
+    pip install PDPbox && \
+    pip install ggplot && \
+    pip install cesium && \
+    pip install rgf_python && \
+    /tmp/clean-layer.sh
+
+# Pin Vowpal Wabbit v8.6.0 because 8.6.1 does not build or install successfully
+RUN cd /usr/local/src && git clone -b 8.6.0 https://github.com/JohnLangford/vowpal_wabbit.git && \
+    ./vowpal_wabbit/python/conda_install.sh && \
+    /tmp/clean-layer.sh
 
 RUN pip install --upgrade numpy && \
     pip install --upgrade pandas && \
@@ -312,6 +356,7 @@ RUN pip install --upgrade numpy && \
     pip install elasticsearch && \
     pip install esanpy && \
     pip install pyarrow && \
+    pip install feather-format && \
     pip install requests && \
     pip install pydotplus && \
     pip install predictionio && \
@@ -322,9 +367,7 @@ RUN pip install --upgrade numpy && \
     pip install pyicu && \
     pip install pycld2 && \
     pip install morfessor && \
-    pip install polyglot
+    pip install polyglot && \
+    /tmp/clean-layer.sh
 
-RUN rm -rf /root/.cache/pip/* && \
-    apt-get autoremove -y && apt-get clean && \
-    rm -rf /usr/local/src/*
 

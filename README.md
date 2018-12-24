@@ -10,7 +10,7 @@ A default authentication for JupyterHub Docker uses GitHub's OAuth.
 ### Ubuntu 16.04 based Image
 
 ```
-./bin/jupyter-docker build -t ubuntu16.04
+./bin/jupyter-docker build -t ubuntu18.04
 ```
 
 ### Machine Learning Image
@@ -22,7 +22,7 @@ A default authentication for JupyterHub Docker uses GitHub's OAuth.
 ### CUDA based Image
 
 ```
-./bin/jupyter-docker build -t cuda9.0-cudnn7
+./bin/jupyter-docker build -t cuda10.0-cudnn7
 ```
 
 ### CUDA based Machine Learning Image
@@ -67,7 +67,7 @@ For details, see `res/addusers.sh`.
 Tag names are as below:
 
 - ubuntu16.04
-- cuda9.0-cudnn7
+- cuda10.0-cudnn7
 - cuda-machinelearning
 
 URL for this Jupyterhub is `http://localhost:8000/`.

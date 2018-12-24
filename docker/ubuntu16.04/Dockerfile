@@ -1,8 +1,10 @@
-FROM ubuntu:xenial
+FROM ubuntu:16.04
 
 MAINTAINER CodeLibs Project
 
 ENV DEBIAN_FRONTEND noninteractive
+
+ADD res/clean-layer.sh /tmp/clean-layer.sh
 
 RUN apt update && apt upgrade -y && apt install -y locales && rm -rf /var/lib/apt/lists/*
 
@@ -13,14 +15,15 @@ ENV LC_ALL en_US.UTF-8
 ENV PIP_DEFAULT_TIMEOUT 180
 
 RUN apt-get update && apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev \
-    libreadline-dev libsqlite3-dev cmake libxml2-dev wget bzip2 sudo vim unzip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    libreadline-dev libsqlite3-dev cmake libxml2-dev wget bzip2 sudo vim unzip libcurl4-openssl-dev \
+    && /tmp/clean-layer.sh
 
 RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
     echo "12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855 *tini" | sha256sum -c - && \
     mv tini /usr/local/bin/tini && \
     chmod +x /usr/local/bin/tini
+
+ENV PATH=/opt/conda/bin:$PATH
 
 RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O /tmp/miniconda.sh \
     && echo 'e1045ee415162f944b6aebfe560b8fee */tmp/miniconda.sh' | md5sum -c - \
@@ -28,21 +31,22 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.s
     && /opt/conda/bin/conda install --yes -c conda-forge \
     python=3.6 sqlalchemy tornado jinja2 traitlets requests pip nodejs configurable-http-proxy ncurses \
     && /opt/conda/bin/pip install --upgrade pip \
-    && /opt/conda/bin/conda clean --all \
-    && rm /tmp/miniconda.sh
+    && /tmp/clean-layer.sh
 
-RUN python3 -m pip install notebook \
-    && python3 -m pip install jupyter \
-    && python3 -m pip install jupyterhub \
-    && python3 -m pip install oauthenticator \
-    && python3 -m pip install jupyterhub-ldapauthenticator \
-    && python3 -m pip install jupyter_contrib_nbextensions \
-    && python3 -m pip install autopep8 \
-    && python3 -m pip install yapf \
-    && rm -rf /root/.cache/pip/* \
-    && rm -rf /usr/local/src/*
+RUN pip install notebook \
+    && pip install jupyter \
+    && pip install jupyterhub \
+    && pip install jupyterlab \
+    && pip install oauthenticator \
+    && pip install jupyterhub-ldapauthenticator \
+    && pip install jupyter_contrib_nbextensions \
+    && pip install autopep8 \
+    && pip install yapf \
+    && pip install pycurl \
+    && /tmp/clean-layer.sh
 
-RUN jupyter contrib nbextension install --system
+RUN jupyter contrib nbextension install --system \
+    && jupyter labextension install @jupyterlab/hub-extension
 
 RUN mkdir -p /opt/oauthenticator
 WORKDIR /opt/oauthenticator

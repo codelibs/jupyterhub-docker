@@ -1,4 +1,4 @@
-FROM nvidia/cuda:9.0-devel-ubuntu16.04
+FROM nvidia/cuda:10.0-devel-ubuntu16.04
 
 MAINTAINER CodeLibs Project
 
@@ -14,12 +14,12 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 ENV PIP_DEFAULT_TIMEOUT 180
 
-ENV CUDNN_VERSION 7.0.5.15
+ENV CUDNN_VERSION 7.4.1.5
 LABEL com.nvidia.cudnn.version="${CUDNN_VERSION}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
-    libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0 \
+    libcudnn7=$CUDNN_VERSION-1+cuda10.0 \
+    libcudnn7-dev=$CUDNN_VERSION-1+cuda10.0 \
     && /tmp/clean-layer.sh
 
 RUN apt-mark hold libcudnn7 libcudnn7-dev cuda-libraries-dev-$CUDA_PKG_VERSION cuda-nvml-dev-$CUDA_PKG_VERSION \
@@ -27,7 +27,7 @@ RUN apt-mark hold libcudnn7 libcudnn7-dev cuda-libraries-dev-$CUDA_PKG_VERSION c
     cuda-libraries-$CUDA_PKG_VERSION libnccl2 cuda-cudart-$CUDA_PKG_VERSION
 
 RUN apt-get update && apt install -y build-essential curl git gcc make openssl libssl-dev libbz2-dev \
-    libreadline-dev libsqlite3-dev cmake libxml2-dev wget bzip2 sudo vim unzip \
+    libreadline-dev libsqlite3-dev cmake libxml2-dev wget bzip2 sudo vim unzip libcurl4-openssl-dev \
     && /tmp/clean-layer.sh
 
 RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.18.0/tini && \
@@ -46,17 +46,20 @@ RUN wget -q https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.s
     && /opt/conda/bin/pip install --upgrade pip \
     && /tmp/clean-layer.sh
 
-RUN python3 -m pip install notebook \
-    && python3 -m pip install jupyter \
-    && python3 -m pip install jupyterhub \
-    && python3 -m pip install oauthenticator \
-    && python3 -m pip install jupyterhub-ldapauthenticator \
-    && python3 -m pip install jupyter_contrib_nbextensions \
-    && python3 -m pip install autopep8 \
-    && python3 -m pip install yapf \
+RUN pip install notebook \
+    && pip install jupyter \
+    && pip install jupyterhub \
+    && pip install jupyterlab \
+    && pip install oauthenticator \
+    && pip install jupyterhub-ldapauthenticator \
+    && pip install jupyter_contrib_nbextensions \
+    && pip install autopep8 \
+    && pip install yapf \
+    && pip install pycurl \
     && /tmp/clean-layer.sh
 
-RUN jupyter contrib nbextension install --system
+RUN jupyter contrib nbextension install --system \
+    && jupyter labextension install @jupyterlab/hub-extension
 
 RUN mkdir -p /opt/oauthenticator
 WORKDIR /opt/oauthenticator
