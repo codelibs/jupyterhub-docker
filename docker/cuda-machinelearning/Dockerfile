@@ -122,7 +122,8 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     cd /usr/local/src && git clone git://github.com/scikit-learn-contrib/py-earth.git && \
     cd py-earth && python setup.py install && \
     pip install essentia && \
-    conda install -y pytorch torchvision -c pytorch && \
+    pip install https://download.pytorch.org/whl/cu100/torch-1.0.0-cp36-cp36m-linux_x86_64.whl && \
+    pip install torchvision && \
     pip install cffi && \
     cd /usr/local/src && git clone https://github.com/pytorch/audio && cd audio && python setup.py install && \
     pip install --upgrade mpld3 && \
