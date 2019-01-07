@@ -10,7 +10,7 @@ RUN apt-get update && \
     rm -rf /var/cache/oracle-jdk8-installer && \
     apt-get update && \
     apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
-    libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 \
+    libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 fonts-noto-cjk \
     dbus fontconfig fontconfig-config fonts-dejavu-core fonts-droid-fallback ghostscript gsfonts hicolor-icon-theme \
     libavahi-client3 libavahi-common-data libavahi-common3 libcairo2 libcap-ng0 libcroco3 \
     libcups2 libcupsfilters1 libcupsimage2 libdatrie1 libdbus-1-3 libdjvulibre-text libdjvulibre21 libfftw3-double3 libfontconfig1 \
