@@ -1,26 +1,27 @@
-FROM codelibs/jupyterhub:cuda10.0-cudnn7
+FROM codelibs/jupyterhub:cuda10.1-cudnn7
 
 MAINTAINER CodeLibs Project
 
-RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
-RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" > /etc/apt/sources.list.d/webupd8team-java-trusty.list
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends oracle-java8-installer && \
-    rm -rf /var/cache/oracle-jdk8-installer && \
+RUN wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add - && \
+    echo deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ bionic main > /etc/apt/sources.list.d/adoptopenjdk.list && \
     apt-get update && \
+    apt-get install -y adoptopenjdk-11-hotspot && \
+    /tmp/clean-layer.sh
+
+RUN apt-get update && \
     apt-get install -y enchant libhunspell-dev font-manager libcupti-dev ocl-icd-libopencl1 and ocl-icd-opencl-dev \
     libboost-dev libboost-system-dev libboost-filesystem-dev libsm6 libxext6 fonts-noto-cjk \
     dbus fontconfig fontconfig-config fonts-dejavu-core fonts-droid-fallback ghostscript gsfonts hicolor-icon-theme \
     libavahi-client3 libavahi-common-data libavahi-common3 libcairo2 libcap-ng0 libcroco3 \
     libcups2 libcupsfilters1 libcupsimage2 libdatrie1 libdbus-1-3 libdjvulibre-text libdjvulibre21 libfftw3-double3 libfontconfig1 \
     libfreetype6 libgdk-pixbuf2.0-0 libgdk-pixbuf2.0-common libgomp1 libgraphite2-3 libgs9 libgs9-common libharfbuzz0b libijs-0.35 \
-    libjasper1 libjbig0 libjbig2dec0 liblcms2-2 liblqr-1-0 libltdl7 libmagickcore-6.q16-2 \
-    libmagickcore-6.q16-2-extra libmagickwand-6.q16-2 libnetpbm10 libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
-    libpaper-utils libpaper1 libpixman-1-0 libpng12-0 librsvg2-2 librsvg2-common libthai-data libthai0 libtiff5 libwmf0.2-7 \
+    libjbig0 libjbig2dec0 liblcms2-2 liblqr-1-0 libltdl7 \
+    libmagickcore-6.q16-2-extra libnetpbm10 libpango-1.0-0 libpangocairo-1.0-0 libpangoft2-1.0-0 \
+    libpaper-utils libpaper1 libpixman-1-0 librsvg2-2 librsvg2-common libthai-data libthai0 libtiff5 libwmf0.2-7 \
     libxcb-render0 libxcb-shm0 netpbm poppler-data p7zip-full imagemagick libatlas-base-dev zlib1g-dev liblcms2-dev libwebp-dev \
     libsasl2-dev libpq-dev graphviz libgdal-dev pandoc sox libsox-dev libsox-fmt-all libjpeg8-dev libjpeg-turbo8-dev \
-    libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 libgeos-dev libgdal1-dev && \
+    libfreetype6-dev libglib2.0-0 libxext6 libsm6 libxrender1 libfontconfig1 libgeos-dev && \
+    conda install mkl-service && \
     /tmp/clean-layer.sh
 
 RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyyaml joblib \
@@ -31,7 +32,7 @@ RUN pip install cython numpy pandas seaborn python-dateutil dask pytagcloud pyya
     pip install opencv-python && \
     pip install keras_applications && \
     pip install keras_preprocessing && \
-    pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.9.0-cp36-cp36m-linux_x86_64.whl && \
+    pip install https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.14.0-cp36-cp36m-linux_x86_64.whl && \
     pip install textblob  && \
     python3 -m textblob.download_corpora && \
     pip install wordcloud && \
@@ -70,23 +71,15 @@ RUN mkdir -p /usr/share/nltk_data && \
     pip install stop-words && \
     pip install Pillow && \
     pip install pyproj && \
-    cd /usr/local/src && git clone https://github.com/matplotlib/basemap.git && \
-    cd basemap && \
-    git checkout v1.1.0 && \
-    # Install geos
-    cd geos-3.3.3 && \
-    export GEOS_DIR=/usr/local && \
-    ./configure --prefix=$GEOS_DIR && \
-    make && make install && \
-    # Install basemap
-    cd .. && python setup.py install && \
-    pip install basemap --no-binary basemap && \
+    conda install basemap && \
     pip install ibis-framework && \
-    conda install -y -c conda-forge proj4 && \
+    conda install -y proj4 && \
     pip install packaging && \
     pip install shapely && \
     pip install cartopy && \
     pip install mxnet && \
+    pip install gluonnlp && \
+    pip install gluoncv && \
     /tmp/clean-layer.sh
 
 # vtk with dependencies
@@ -126,6 +119,7 @@ RUN cd /usr/local/src && mkdir h2o && cd h2o && \
     pip install torchvision && \
     pip install cffi && \
     cd /usr/local/src && git clone https://github.com/pytorch/audio && cd audio && python setup.py install && \
+    cd /usr/local/src && \
     pip install --upgrade mpld3 && \
     pip install mplleaflet && \
     pip install gpxpy && \
@@ -161,7 +155,7 @@ RUN pip install plotly && \
     pip install heamy && \
     pip install vida && \
     pip install missingno && \
-    pip install pandas-profiling && \
+    pip install git+https://github.com/pandas-profiling/pandas-profiling.git && \
     pip install s2sphere && \
     pip install git+https://github.com/fmfn/BayesianOptimization.git && \
     pip install matplotlib-venn && \
@@ -341,7 +335,24 @@ RUN pip install testpath && \
     pip install ggplot && \
     pip install cesium && \
     pip install rgf_python && \
+    pip install pytext-nlp==0.1.2 && \
+    pip install tsfresh && \
+    pip install pymagnitude && \
+    pip install pykalman && \
+    pip install optuna && \
+    pip install chainercv && \
+    pip install plotly_express && \
     /tmp/clean-layer.sh
+
+# Tesseract and some associated utility packages
+RUN apt-get install tesseract-ocr -y && \
+    pip install pytesseract && \
+    pip install wand && \
+    pip install pdf2image && \
+    pip install PyPDF && \
+    pip install pyocr && \
+    /tmp/clean-layer.sh
+ENV TESSERACT_PATH=/usr/bin/tesseract
 
 # Pin Vowpal Wabbit v8.6.0 because 8.6.1 does not build or install successfully
 RUN cd /usr/local/src && git clone -b 8.6.0 https://github.com/JohnLangford/vowpal_wabbit.git && \
@@ -371,13 +382,13 @@ RUN pip install --upgrade numpy && \
     pip install polyglot && \
     /tmp/clean-layer.sh
 
-ENV BAZEL_VERSION=0.15.2 \
+ENV BAZEL_VERSION=0.24.1 \
     PYTHON_BIN_PATH=/opt/conda/bin/python \
     PYTHON_LIB_PATH=/opt/conda/lib/python3.6/site-packages \
     TF_NEED_OPENCL_SYCL=0 \
     TF_NEED_ROCM=0 \
     TF_NEED_CUDA=1 \
-    TF_CUDA_VERSION=10.0 \
+    TF_CUDA_VERSION=10.1 \
     CUDA_TOOLKIT_PATH=/usr/local/cuda \
     TF_CUDNN_VERSION=7 \
     CUDNN_INSTALL_PATH=/usr/lib/x86_64-linux-gnu \
@@ -400,7 +411,7 @@ RUN pip uninstall -y tensorflow && \
     rm bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
     git clone https://github.com/tensorflow/tensorflow.git && \
     cd tensorflow && \
-    git checkout r1.12 && \
+    git checkout r1.14 && \
     ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:${LD_LIBRARY_PATH} && \
     ./configure && \

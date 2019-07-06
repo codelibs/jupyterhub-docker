@@ -10,6 +10,8 @@
 set -e
 set -x
 
+# Change a working directory
+cd
 # Delete files that pip caches when installing a package.
 rm -rf /root/.cache/pip/*
 # Delete old downloaded archive files
